@@ -7,6 +7,10 @@ all: make_self.c package_finalize.c
 	${CC} make_self.c -o bin/make_self_sprx ${CFLAGS} ${LDFLAGS} -DSPRX
 	${CC} make_self.c -o bin/make_self_npdrm ${CFLAGS} ${LDFLAGS} -DNPDRM
 	${CC} make_self.c -o bin/make_self_nocrypt ${CFLAGS} ${LDFLAGS} -DNOCRYPT
+	echo ... > bin/placeholder
 
 clean:
 	rm -rf bin/*
+
+install:
+	install -C -m 755 -v bin/* /usr/bin
