@@ -1,4 +1,5 @@
-CFLAGS	:= -Iinclude
+CC	:= gcc
+CFLAGS	:= -Iinclude -g
 LDFLAGS	:= -lcrypto -lssl -lgmp -lz
 TARGETS	:= package_finalize make_self_npdrm make_self_sprx make_self_nocrypt
 
