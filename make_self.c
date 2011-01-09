@@ -575,7 +575,7 @@ int main(int argc, char* argv[]) {
   mpz_export(&output_self_data[get_u64(&output_self_data[get_u32(output_self_data+0xC)+0x60])+0x16], &countp, 1, 0x14, 1, 0, cs);
 
 // write the output self test
-  FILE *test_self_file = fopen(argv[2], "wb");
+  FILE *test_self_file = fopen("test_out.self", "wb");
   fwrite(output_self_data, 1, running_size, test_self_file);
   fclose(test_self_file);
 
