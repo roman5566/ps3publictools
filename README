@@ -3,3 +3,14 @@ it does not contain any info on decrypting or removing NPDRM
 NPDRM is required for interoperability of our homebrew applications
 package_finalize turns your debug packages into psuedoretail packages
 psuedoretail packages install on a geohot jailbroken PS3
+
+make_self_sprx makes valid sprx files from elfs
+it has private keys, so they will be redacted, go look
+at rms's c arrays for them, they should be there
+
+make_self_nocrypt just does not encrypt the self
+
+licensed under gplv3. 
+(c) copyright geohot, George Hotz 2011.
+
+
