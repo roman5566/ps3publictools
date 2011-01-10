@@ -430,7 +430,7 @@ main(int argc, char *argv[])
 
 #ifdef NPDRM
 	if (argc < 3) {
-		printf("usage: %s input.elf output.self <titleid>\n", argv[0]);
+		printf("usage: %s input.elf output.self [content id]\n", argv[0]);
 		printf("  warning NPDRM cares about the output file name, do not rename\n");
 		return -1;
 	}
@@ -632,10 +632,12 @@ main(int argc, char *argv[])
 	/* mpz_export(all_signed.S, &countp, 1, 0x14, 1, 0, cs); */
 	mpz_export(&output_self_data[get_u64(&output_self_data[get_u32(output_self_data + 0xC) + 0x60]) + 0x16], &countp, 1, 0x14, 1, 0, cs);
 
+#ifdef TESTING
 	/* write the output self test */
 	FILE  *test_self_file = fopen("test_out.self", "wb");
 	fwrite(output_self_data, 1, running_size, test_self_file);
 	fclose(test_self_file);
+#endif
 
 	/* encrypt metadata */
 	int    metadata_offset = get_u32(&(output_self_header.s_esize)) + sizeof(Self_Shdr);
