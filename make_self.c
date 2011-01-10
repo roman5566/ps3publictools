@@ -37,7 +37,7 @@
 #define KEY(SUFFIX) appold_##SUFFIX
 #endif
 
-u   ubpadding_static[] = {
+u8  nubpadding_static[] = {
 	0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 #ifdef SPRX
@@ -86,7 +86,7 @@ u8   sdkversion_static[] = {
 
 AES_KEY         aes_key;
 
-u8             *input_elf_data;
+u8    *input_elf_data;
 
 #define ZLIB_LEVEL 6
 #define DEFLATION_BUFFER_SIZE 0x1000000
@@ -95,7 +95,7 @@ u8   def_buffer[DEFLATION_BUFFER_SIZE];
 int 
 def(u8 * source, int source_size, u8 * dest, int *dest_size)
 {
-	int             ret;
+	int    ret;
 	unsigned        have;
 	z_stream        strm;
 
@@ -172,12 +172,12 @@ init_Self_Ehdr(Self_Ehdr * hdr)
 #endif
 }
 
-int             input_elf_len;
+int    input_elf_len;
 
 void 
 read_elf_file(char *filename)
 {
-	FILE           *input_elf_file = fopen(filename, "rb");
+	FILE  *input_elf_file = fopen(filename, "rb");
 	fseek(input_elf_file, 0, SEEK_END);
 	input_elf_len = ftell(input_elf_file);
 	fseek(input_elf_file, 0, SEEK_SET);
@@ -196,13 +196,13 @@ u8   zero_padding[0x10000];
 void 
 enumerate_segments()
 {
-	int             i, num;
+	int    i, num;
 	size_t          countp;
 	u8   ecount_buf[0x10], iv[0x10];
 	Self_Segment   *segment_ptr = &first_segment;
 	Elf64_Phdr     *elf_segment = (Elf64_Phdr *) (&input_elf_data[get_u64(&(input_elf_header->e_phoff))]);
 
-	mpz_t           riv, erk, hmac;
+	mpz_t  riv, erk, hmac;
 	mpz_init(riv);
 	mpz_init(erk);
 	mpz_init(hmac);
@@ -243,11 +243,11 @@ enumerate_segments()
 		}
 		segment_ptr->rlen = get_u64(&(elf_segment->p_filesz));
 
-		u32             in_data_offset = get_u64(&(elf_segment->p_offset));
-		u8             *in_data = &input_elf_data[in_data_offset];
+		u32    in_data_offset = get_u64(&(elf_segment->p_offset));
+		u8    *in_data = &input_elf_data[in_data_offset];
 
 		if (segment_ptr->compressed) {
-			int             def_size = DEFLATION_BUFFER_SIZE;
+			int    def_size = DEFLATION_BUFFER_SIZE;
 			printf("deflated...", def(in_data, segment_ptr->rlen, def_buffer, &def_size));
 			fflush(stdout);
 			segment_ptr->len = def_size;
@@ -323,7 +323,7 @@ init_Self_NPDRM(Self_NPDRM * npdrm, char *titleid, char *filename)
 	set_u32(&npdrm->unknown5, 1);
 	strncpy(npdrm->titleid, titleid, 0x30);
 
-	char           *true_filename = strrchr(filename, '/');
+	char  *true_filename = strrchr(filename, '/');
 	if (true_filename == NULL) {
 		true_filename = strrchr(filename, '\\');
 	}
@@ -334,12 +334,12 @@ init_Self_NPDRM(Self_NPDRM * npdrm, char *titleid, char *filename)
 	}
 
 	u8   npdrm_omac_key[0x10];
-	int             i;
+	int    i;
 	for (i = 0; i < 0x10; i++)
 		npdrm_omac_key[i] = npdrm_omac_key1[i] ^ npdrm_omac_key2[i];
 
-	int             buf_len = 0x30 + strlen(true_filename);
-	char           *buf = (char *) malloc(buf_len);
+	int    buf_len = 0x30 + strlen(true_filename);
+	char  *buf = (char *) malloc(buf_len);
 	memcpy(buf, npdrm->titleid, 0x30);
 	strcpy(buf + 0x30, true_filename);
 	aesOmac1Mode(npdrm->hash1, buf, buf_len, npdrm_omac_key3, sizeof(npdrm_omac_key3) * 8);
@@ -348,7 +348,8 @@ init_Self_NPDRM(Self_NPDRM * npdrm, char *titleid, char *filename)
 }
 
 u8   segment_crypt_data[0x2000];
-int             segment_crypt_data_len = 0;
+int    segment_crypt_data_len = 0;
+
 void 
 build_segment_crypt_data()
 {
@@ -379,14 +380,14 @@ build_segment_crypt_data()
 }
 
 typedef struct {
-	void           *data;
-	int             len;
-	void           *next;
+	void  *data;
+	int    len;
+	void  *next;
 }    file_ll;
 
 file_ll         start_file;
 file_ll        *file_ll_ptr = &start_file;
-int             running_size;
+int    running_size;
 
 void 
 add_file_section(void *data, int len)
@@ -401,13 +402,13 @@ add_file_section(void *data, int len)
 	running_size += len;
 }
 
-u8             *output_self_data;
+u8    *output_self_data;
 void 
 write_self_file_in_memory()
 {
 	output_self_data = (u8 *) malloc(running_size);
 	file_ll_ptr = &start_file;
-	u8             *output_self_data_ptr = output_self_data;
+	u8    *output_self_data_ptr = output_self_data;
 	while (file_ll_ptr != NULL) {
 		/* printf("adding %X\n", file_ll_ptr->len); */
 		memcpy(output_self_data_ptr, file_ll_ptr->data, file_ll_ptr->len);
@@ -419,10 +420,10 @@ write_self_file_in_memory()
 int 
 main(int argc, char *argv[])
 {
-	int             i;
+	int    i;
 	u8   ecount_buf[0x10], iv[0x10];
 	size_t          countp;
-	int             num;
+	int    num;
 	Self_Segment   *segment_ptr;
 
 	memset(zero_padding, 0, sizeof(zero_padding));
@@ -493,7 +494,7 @@ main(int argc, char *argv[])
 #ifdef NPDRM
 	memcpy(&md_header, npdrm_keypair_d, sizeof(md_header));
 #else
-	mpz_t           bigriv, bigerk;
+	mpz_t  bigriv, bigerk;
 	mpz_init(bigriv);
 	mpz_init(bigerk);
 	mpz_urandomb(bigerk, r_state, 128);
@@ -503,7 +504,7 @@ main(int argc, char *argv[])
 	mpz_export(md_header.riv, &countp, 1, 0x10, 1, 0, bigriv);
 #endif
 
-	mpz_t           n, k, da, kinv, r, cs, z;
+	mpz_t  n, k, da, kinv, r, cs, z;
 	mpz_init(n);
 	mpz_init(k);
 	mpz_init(da);
@@ -571,7 +572,7 @@ main(int argc, char *argv[])
 	/* 0x*** -- segment_certification_header */
 	add_file_section(&segment_header, sizeof(segment_header));
 	/* 0x*** -- all segment_certification_segment incrypt */
-	int             incrypt_count = 0;
+	int    incrypt_count = 0;
 	segment_ptr = &first_segment;
 	while (segment_ptr != NULL) {
 		if (segment_ptr->incrypt) {
@@ -632,12 +633,12 @@ main(int argc, char *argv[])
 	mpz_export(&output_self_data[get_u64(&output_self_data[get_u32(output_self_data + 0xC) + 0x60]) + 0x16], &countp, 1, 0x14, 1, 0, cs);
 
 	/* write the output self test */
-	FILE           *test_self_file = fopen("test_out.self", "wb");
+	FILE  *test_self_file = fopen("test_out.self", "wb");
 	fwrite(output_self_data, 1, running_size, test_self_file);
 	fclose(test_self_file);
 
 	/* encrypt metadata */
-	int             metadata_offset = get_u32(&(output_self_header.s_esize)) + sizeof(Self_Shdr);
+	int    metadata_offset = get_u32(&(output_self_header.s_esize)) + sizeof(Self_Shdr);
 
 #ifndef NO_CRYPT
 	memset(ecount_buf, 0, 16);
@@ -661,7 +662,7 @@ main(int argc, char *argv[])
 #endif
 
 	/* write the output self */
-	FILE           *output_self_file = fopen(argv[2], "wb");
+	FILE  *output_self_file = fopen(argv[2], "wb");
 	fwrite(output_self_data, 1, running_size, output_self_file);
 	fclose(output_self_file);
 }
